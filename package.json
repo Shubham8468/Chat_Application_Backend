@@ -1,0 +1,15 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "for the chat application Backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "nodemon server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git remote add origin https://github.com/Shubham8468/Chat_Application_Backend.git"
+  },
+  "author": "Shubham",
+  "license": "ISC"
+}
