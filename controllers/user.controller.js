@@ -58,6 +58,20 @@ export const signin=catchAsyncError(async (req,resp,next)=>{
     generateJWTToken(user,"Login succussfully.",200,resp);
 
 })
-export const signout=catchAsyncError(async (req,resp,next)=>{})
+export const signout=catchAsyncError(async (req,resp,next)=>
+    {
+        return resp.status(200).cookie('token',token,{
+        httpOnly:true,
+        maxAge:process.env.COOKIE_EXPIRE *24 *60*60*1000,
+        sameSite:'strict',// for privent crose site attack 
+        secure:process.env.NODE_ENV !=='devlopment' ? true:false //ager project devlopment me nhi hai to true kr do mtlab http not allowed 
+        //hai to false mtlb http allowed!!!
+    }).json({
+        success:true,
+        message,
+        token,
+    })
+    }
+)
 export const getUser=catchAsyncError(async (req,resp,next)=>{})
 export const updateProfile=catchAsyncError(async (req,resp,next)=>{})
