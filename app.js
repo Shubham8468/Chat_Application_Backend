@@ -5,6 +5,7 @@ import cors from 'cors'
 import fileUpload from 'express-fileupload';
 import DbConnection from './database/db.js';
 import router from './routes/user.route.js';
+import messageRouter from './routes/message.route.js'
 const app=express();
 config({ path: './config/.env' })
 app.use(cors({
@@ -25,6 +26,7 @@ app.use(
     )
 );
 app.use('/api/v1/user',router)// this is the static url
+app.use('/api/v1/message',messageRouter);
 DbConnection();
 
 export default app;
