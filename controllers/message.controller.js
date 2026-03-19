@@ -2,6 +2,7 @@ import { catchAsyncError } from "../middelware/catchAsyncError.middelware.js"
 import { User } from '../model/user.model.js'
 import { Message } from '../model/message.model.js'
 import { v2 as cloudinary } from 'cloudinary'
+import { getReceiverSocketId } from "../utils/socket.io.js"
 
 export const getAllUsers = catchAsyncError(async (req, resp, next) => {
     const user = req.user;
@@ -11,7 +12,7 @@ export const getAllUsers = catchAsyncError(async (req, resp, next) => {
 
 })
 export const getMessages = catchAsyncError(async (req, resp, next) => {
-    const reciverId = req.params.id;
+    const reciverId = req.params.id;//get from the frontend application
     const myId = req.user._id;
     const reciver = await User.findById(reciverId);// reciver ki id le ke DB me check kruga 
     if (!reciver) {
@@ -34,13 +35,13 @@ export const getMessages = catchAsyncError(async (req, resp, next) => {
 export const sendMessage = catchAsyncError(async (req, resp, next) => {
     const { text } = req.body;
     const media = req?.files?.media;
-    const { id: receiverId } = req.params;
+    const { id: reciverId } = req.params;
     const senderId = req.user._id;
-    const reciver = await User.findById(receiverId);
+    const reciver = await User.findById(reciverId);
     if (!reciver) {
         return resp.status(400).json({ success: false, message: "Receiver In Invalid." })
     }
-    const sanitizedText = text?.trim() || "";
+    const sanitizedText  = text?.trim() || "";
     if (!sanitizedText && !media) {
         return resp.status(400).json({ success: false, message: 'Cannot send empty message.' })
     }
@@ -48,7 +49,7 @@ export const sendMessage = catchAsyncError(async (req, resp, next) => {
 
     if (media) {
         try {
-            const uploadResponse = await cloudinary.uploader.upload();
+            const uploadResponse = await cloudinary.uploader.upload(
             media.tempFilePath, {
                 resource_type: "auto", // auto-detecy img/videos come from frontend
                 folder: "CHAT_APP_MEDIA",
@@ -57,13 +58,24 @@ export const sendMessage = catchAsyncError(async (req, resp, next) => {
                 { fetch_formet: "auto" },
                 ]
             }
+        );
             mediaUrl = uploadResponse.secure_url;// lo isme put kr diya img/vid ka url jo frondent ko jaye ga
         }catch(err){
             console.log("Cloudnary error:",err)
             return resp.status(500).json({success:false,message:'Failed to upload media.Please try again later.'})
         }
     }
-    
+    const newMessage=await Message.create({ // in this we put use Message in DB
+        senderId,
+        reciverId,
+        text:sanitizedText,
+        media: mediaUrl
+    });
+    const receiverSocketId= getReceiverSocketId(reciverId);
+    if(receiverSocketId){
+        io.to(reciverId).emit("newMessage",newMessage)// to ka isi socketId pr emit krna hai
+    }
+    return resp.status(201).json(newMessage);
 })
 
 
