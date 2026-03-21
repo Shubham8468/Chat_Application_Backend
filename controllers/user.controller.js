@@ -36,7 +36,7 @@ export const signup=catchAsyncError(async (req,resp,next)=>{
 })
 export const signin=catchAsyncError(async (req,resp,next)=>{
     const {email,password}=req.body;
-    if(!email,!password){
+    if(!email || !password){
         return resp.status(400).json({message:"Please provide email and Password!!"})
     }
     //Now i check email formet
@@ -53,7 +53,7 @@ export const signin=catchAsyncError(async (req,resp,next)=>{
     //Now i match user pass with Db pass
     const isPasswordMatched=await bcrypt.compare(password,user.password);
     if(!isPasswordMatched){
-        return resp.json({success:false,message:"Pleas Enter correct password."})
+        return resp.status(400).json({success:false,message:"Pleas Enter correct password."})
     }
     //Now again i generate token 
     generateJWTToken(user,"Login succussfully.",200,resp);
@@ -61,11 +61,12 @@ export const signin=catchAsyncError(async (req,resp,next)=>{
 })
 export const signout=catchAsyncError(async (req,resp,next)=>
     {
+        const isProduction = process.env.NODE_ENV === 'production';
         return resp.status(200).cookie('token','',{
         httpOnly:true,
         maxAge:0,//for user logout
-        sameSite:'strict',// for privent crose site attack 
-        secure:process.env.NODE_ENV !=='devlopment' ? true:false //ager project devlopment me nhi hai to true kr do mtlab http not allowed 
+        sameSite: isProduction ? 'none' : 'strict',
+        secure: isProduction
         //hai to false mtlb http allowed!!!
     }).json({
         success:true,

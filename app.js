@@ -8,10 +8,21 @@ import router from './routes/user.route.js';
 import messageRouter from './routes/message.route.js'
 const app=express();
 config({ path: './config/.env' })
+
+const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean);
+
 app.use(cors({
-    origin:[process.env.FRONTEND_URL],
+    origin:(origin, callback)=>{
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error('Not allowed by CORS'));
+    },
     credentials:true,
-    methods:['GET','PUT','POST','DELETE']
+    methods:['GET','PUT','POST','PATCH','DELETE','OPTIONS'],
+    allowedHeaders:['Content-Type','Authorization']
 }))
 app.use(cookieParser())
 app.use(express.json())
