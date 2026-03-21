@@ -9,7 +9,13 @@ import messageRouter from './routes/message.route.js'
 const app=express();
 config({ path: './config/.env' })
 
-const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '')
+const fallbackOrigins = [
+    'https://chat-application-frontend.vercel.app',
+    'http://localhost:5173',
+    'http://localhost:5174'
+];
+
+const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || fallbackOrigins.join(','))
     .split(',')
     .map((origin) => origin.trim())
     .filter(Boolean);
