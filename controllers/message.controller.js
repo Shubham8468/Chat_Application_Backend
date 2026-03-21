@@ -2,7 +2,7 @@ import { catchAsyncError } from "../middelware/catchAsyncError.middelware.js"
 import { User } from '../model/user.model.js'
 import { Message } from '../model/message.model.js'
 import { v2 as cloudinary } from 'cloudinary'
-import { getReceiverSocketId } from "../utils/socket.io.js"
+import { getReceiverSocketId, io } from "../utils/socket.io.js"
 
 export const getAllUsers = catchAsyncError(async (req, resp, next) => {
     const user = req.user;
@@ -27,7 +27,7 @@ export const getMessages = catchAsyncError(async (req, resp, next) => {
         ],
     }).sort({ createdAt: 1 }) // ye message ko shor kr ke dega jo last me aaya vo phle hoga
 
-    return resp.status(200).json({ success: true, message: "" })
+    return resp.status(200).json({ success: true, messages })
 
 
 
@@ -73,7 +73,7 @@ export const sendMessage = catchAsyncError(async (req, resp, next) => {
     });
     const receiverSocketId= getReceiverSocketId(reciverId);
     if(receiverSocketId){
-        io.to(reciverId).emit("newMessage",newMessage)// to ka isi socketId pr emit krna hai
+        io.to(receiverSocketId).emit("newMessage",newMessage)// to ka isi socketId pr emit krna hai
     }
     return resp.status(201).json(newMessage);
 })

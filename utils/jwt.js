@@ -7,7 +7,7 @@ export const generateJWTToken= async (user,message,statusCode,resp)=>{
         httpOnly:true,
         maxAge:process.env.COOKIE_EXPIRE *24 *60*60*1000,
         sameSite:'strict',// for privent crose site attack 
-        secure:process.env.NODE_ENV !=='devlopment' ? true:false //ager project devlopment me nhi hai to true kr do mtlab http not allowed 
+        secure:process.env.NODE_ENV !=='development' ? true:false //ager project development me nhi hai to true kr do mtlab http not allowed 
         //hai to false mtlb http allowed!!!
     }).json({
         success:true,
