@@ -19,13 +19,12 @@ export const getMessages = catchAsyncError(async (req, resp, next) => {
         return resp.status(400).json({ success: false, message: "Reciver id invalid." })
     }
 
-    //
     const messages = await Message.find({
         $or: [
             { senderId: myId, reciverId: reciverId },//jb me message send kruga to bhi message fetch kreke do 
             { senderId: reciverId, reciverId: myId }//jb koi aur message krega to bhi fetch krke do
         ],
-    }).sort({ createdAt: 1 }); // Oldest first, newest at bottom
+    }).sort({ createdAt: 1, _id: 1 }); // Ascending: oldest message first (top), newest last (bottom)
 
     return resp.status(200).json({ success: true, messages })
 
