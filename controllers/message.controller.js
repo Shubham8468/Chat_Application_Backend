@@ -44,30 +44,24 @@ export const sendMessage = catchAsyncError(async (req, resp, next) => {
     if (!sanitizedText && !media) {
         return resp.status(400).json({ success: false, message: 'Cannot send empty message.' })
     }
-  let mediaUrl = "";// isme hm cloudnary pe jo vid/img hai uska url store krege jo frontend me jaye ga
+  let mediaUrl = "";
 
     if (media) {
         try {
             console.log("Uploading media:", { fileName: media.name, size: media.size });
             
-            // Upload directly from buffer using upload_stream (works on Vercel serverless)
-            const uploadResponse = await new Promise((resolve, reject) => {
-                const stream = cloudinary.uploader.upload_stream(
-                    {
-                        resource_type: "auto",
-                        folder: "CHAT_APP_MEDIA",
-                        transformation: [
-                            { width: 1080, height: 1080 },
-                            { quality: "auto" },
-                            { fetch_format: "auto" },
-                        ]
-                    },
-                    (error, result) => {
-                        if (error) reject(error);
-                        else resolve(result);
-                    }
-                );
-                stream.end(media.data); // Use buffer directly
+            // Upload using dataURI from buffer (works on Vercel)
+            const base64Data = media.data.toString('base64');
+            const dataURI = `data:${media.mimetype};base64,${base64Data}`;
+            
+            const uploadResponse = await cloudinary.uploader.upload(dataURI, {
+                resource_type: "auto",
+                folder: "CHAT_APP_MEDIA",
+                transformation: [
+                    { width: 1080, height: 1080 },
+                    { quality: "auto" },
+                    { fetch_format: "auto" },
+                ]
             });
             
             console.log("Cloudinary upload successful:", uploadResponse.public_id);

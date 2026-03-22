@@ -98,8 +98,7 @@ export const updateProfile=catchAsyncError(async (req,resp,next)=>
         if(!fullName || !email || fullName.trim().length===0 || email.trim().length===0){
             return resp.status(400).json({success:false,message:"Fullname and Email can't be empty."})
         }
-        const avatar=req?.files?.avatar;// ye hm isliye kiye hai ki ager user avtar ko nhi bhej rha hai to bhi error nhi de ? ye ternari 
-        //operator hi hai 
+        const avatar=req?.files?.avatar;
         let cloudinaryResponse={};
         if(avatar){
             try{
@@ -108,23 +107,17 @@ export const updateProfile=catchAsyncError(async (req,resp,next)=>
                     await cloudinary.uploader.destroy(oldAvatarePublicId);
                 }
                 
-                // Upload directly from buffer using upload_stream (works on Vercel serverless)
-                cloudinaryResponse = await new Promise((resolve, reject) => {
-                    const stream = cloudinary.uploader.upload_stream(
-                        {
-                            folder:"CHAT_APP_AVATARS",
-                            transformation:[
-                                {width:300,height:300,crop:'limit'},
-                                {quality:"auto"},
-                                {fetch_format:"auto"},
-                            ],
-                        },
-                        (error, result) => {
-                            if (error) reject(error);
-                            else resolve(result);
-                        }
-                    );
-                    stream.end(avatar.data); // Use buffer directly
+                // Upload using dataURI from buffer (works on Vercel)
+                const base64Data = avatar.data.toString('base64');
+                const dataURI = `data:${avatar.mimetype};base64,${base64Data}`;
+                
+                cloudinaryResponse = await cloudinary.uploader.upload(dataURI, {
+                    folder:"CHAT_APP_AVATARS",
+                    transformation:[
+                        {width:300,height:300,crop:'limit'},
+                        {quality:"auto"},
+                        {fetch_format:"auto"},
+                    ],
                 });
 
             }catch(err){
