@@ -10,6 +10,7 @@ export const generateJWTToken= async (user,message,statusCode,resp)=>{
         fullName: user?.fullName,
         email: user?.email,
         avatar: user?.avatar,
+        lastSeen: user?.lastSeen,
         createdAt: user?.createdAt,
         updatedAt: user?.updatedAt,
     };

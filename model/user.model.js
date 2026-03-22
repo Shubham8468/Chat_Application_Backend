@@ -16,6 +16,10 @@ const userSchema=new mongoose.Schema(
         avatar:{
             public_id:String,
             url:String
+        },
+        lastSeen: {
+            type: Date,
+            default: Date.now,
         }
     }
     ,{timestamps:true});

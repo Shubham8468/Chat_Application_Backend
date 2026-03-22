@@ -55,6 +55,10 @@ export const signin=catchAsyncError(async (req,resp,next)=>{
     if(!isPasswordMatched){
         return resp.status(400).json({success:false,message:"Pleas Enter correct password."})
     }
+
+    user.lastSeen = new Date();
+    await user.save();
+
     //Now again i generate token 
     generateJWTToken(user,"Login succussfully.",200,resp);
 
@@ -77,8 +81,15 @@ export const signout=catchAsyncError(async (req,resp,next)=>
 
 export const getUser=catchAsyncError(async (req,resp,next)=>
     {
-        const user=await User.findById(req.user._id);
+        const user=await User.findByIdAndUpdate(req.user._id, { lastSeen: new Date() }, { new: true });
         return resp.status(200).json({success:true,user})
+    }
+)
+
+export const updatePresence=catchAsyncError(async (req,resp,next)=>
+    {
+        const user = await User.findByIdAndUpdate(req.user._id, { lastSeen: new Date() }, { new: true });
+        return resp.status(200).json({success:true,lastSeen:user?.lastSeen})
     }
 )
 export const updateProfile=catchAsyncError(async (req,resp,next)=>
