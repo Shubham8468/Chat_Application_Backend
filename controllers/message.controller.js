@@ -25,7 +25,7 @@ export const getMessages = catchAsyncError(async (req, resp, next) => {
             { senderId: myId, reciverId: reciverId },//jb me message send kruga to bhi message fetch kreke do 
             { senderId: reciverId, reciverId: myId }//jb koi aur message krega to bhi fetch krke do
         ],
-    }).sort({ createdAt: 1 }) // ye message ko shor kr ke dega jo last me aaya vo phle hoga
+    }).sort({ createdAt: 1 }); // Oldest first, newest at bottom
 
     return resp.status(200).json({ success: true, messages })
 
