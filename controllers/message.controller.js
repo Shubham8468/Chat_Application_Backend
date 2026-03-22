@@ -33,7 +33,7 @@ export const getMessages = catchAsyncError(async (req, resp, next) => {
 
 });
 export const sendMessage = catchAsyncError(async (req, resp, next) => {
-    const { text } = req.body;
+    const text = req.body?.text;
     const media = req?.files?.media;
     const { id: reciverId } = req.params;
     const senderId = req.user._id;
@@ -55,7 +55,7 @@ export const sendMessage = catchAsyncError(async (req, resp, next) => {
                 folder: "CHAT_APP_MEDIA",
                 transformation: [{ width: 1080, height: 1080 },
                 { quality: "auto" },
-                { fetch_formet: "auto" },
+                { fetch_format: "auto" },
                 ]
             }
         );

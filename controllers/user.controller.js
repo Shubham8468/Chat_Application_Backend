@@ -78,7 +78,7 @@ export const signout=catchAsyncError(async (req,resp,next)=>
 export const getUser=catchAsyncError(async (req,resp,next)=>
     {
         const user=await User.findById(req.user._id);
-        return resp.status(200).json({success:false,user})
+        return resp.status(200).json({success:true,user})
     }
 )
 export const updateProfile=catchAsyncError(async (req,resp,next)=>

@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser'
 import { config } from 'dotenv'
 import cors from 'cors'
 import fileUpload from 'express-fileupload';
+import path from 'path';
 import DbConnection from './database/db.js';
 import router from './routes/user.route.js';
 import messageRouter from './routes/message.route.js'
@@ -10,7 +11,7 @@ const app=express();
 config({ path: './config/.env' })
 
 const fallbackOrigins = [
-    'https://chat-application-frontend.vercel.app',
+    'https://chat-application-backend-rust.vercel.app',// here you pase frontend url 
     'http://localhost:5173',
     'http://localhost:5174'
 ];
@@ -38,7 +39,8 @@ app.use(
     fileUpload(
         {
             useTempFiles:true,
-            tempFileDir:'/temp/', // jo fule frontend se aa rhi hai vo temp folder me store hoga
+            tempFileDir:path.join(process.cwd(), 'temp'), // store uploads in project temp folder
+            createParentPath:true,
         }
     )
 );
