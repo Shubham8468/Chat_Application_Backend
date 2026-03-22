@@ -11,7 +11,7 @@ const app=express();
 config({ path: './config/.env' })
 
 const fallbackOrigins = [
-    'https://chat-application-backend-rust.vercel.app',// here you pase frontend url 
+    'https://chat-application-fontend.vercel.app',// here you pase frontend url 
     'http://localhost:5173',
     'http://localhost:5174'
 ];
