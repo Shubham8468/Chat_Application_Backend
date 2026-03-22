@@ -11,20 +11,24 @@ const app=express();
 config({ path: './config/.env' })
 
 const fallbackOrigins = [
-    'https://chat-application-fontend.vercel.app',// here you pase frontend url 
+    'https://chat-application-fontend.vercel.app',
+    'https://chat-application-frontend.vercel.app',
     'http://localhost:5173',
     'http://localhost:5174'
 ];
 
+const normalizeOrigin = (value) => (value || '').trim().replace(/\/$/, '');
+
 const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || fallbackOrigins.join(','))
     .split(',')
-    .map((origin) => origin.trim())
+    .map((origin) => normalizeOrigin(origin))
     .filter(Boolean);
 
 app.use(cors({
     origin:(origin, callback)=>{
         if (!origin) return callback(null, true);
-        if (allowedOrigins.includes(origin)) return callback(null, true);
+        const requestOrigin = normalizeOrigin(origin);
+        if (allowedOrigins.includes(requestOrigin)) return callback(null, true);
         return callback(new Error('Not allowed by CORS'));
     },
     credentials:true,
