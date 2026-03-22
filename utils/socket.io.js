@@ -1,6 +1,7 @@
 import {Server} from 'socket.io'
 
 const userSocketMap={};
+const socketUserMap = {};
 let io;
 
 const fallbackOrigins = [
@@ -11,10 +12,14 @@ const fallbackOrigins = [
 ];
 
 const normalizeOrigin = (value) => (value || '').trim().replace(/\/$/, '');
-const socketAllowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || fallbackOrigins.join(','))
+const envOrigins = [process.env.FRONTEND_URLS, process.env.FRONTEND_URL]
+    .filter(Boolean)
+    .join(',')
     .split(',')
     .map((origin) => normalizeOrigin(origin))
     .filter(Boolean);
+
+const socketAllowedOrigins = [...new Set([...fallbackOrigins.map((origin) => normalizeOrigin(origin)), ...envOrigins])];
 
 export function initSocket(server){
     io=new Server(server,{
@@ -30,21 +35,33 @@ export function initSocket(server){
     });
     io.on("connection",(socket)=>{// this is listen the event that are arise from the frontend.. its name is "connection"
         console.log("A User connected to the server",socket.id)
-        const userId=socket.handshake.query.userId // this are method to get user id from the socket 
+        const userId = String(socket.handshake.query.userId || ''); // this are method to get user id from the socket 
         if(userId){
-            userSocketMap[userId]=socket.id;// ime userSocketMap me "userId" name is key bnao jiski value socket.id kro
+            if (!userSocketMap[userId]) {
+                userSocketMap[userId] = new Set();
+            }
+            userSocketMap[userId].add(socket.id);
+            socketUserMap[socket.id] = userId;
         }
         io.emit("getOnlineUsers",Object.keys(userSocketMap));// emit ka mtlab hai ki jitne connected user hai system ke sath .unsmko ek event trigar kro jika name hoga "
         // " unsmko data bhejna hai jo "Object.keys(userSocketMap)"
         socket.on("disconnect",()=>{//agr frontend pe user disconnect hota hai to ..
-            console.log("A user disconnected",socket.io);
-            delete userSocketMap[userId];// user ko delete kro 
+            const disconnectedUserId = socketUserMap[socket.id] || userId;
+            if (disconnectedUserId && userSocketMap[disconnectedUserId]) {
+                userSocketMap[disconnectedUserId].delete(socket.id);
+                if (userSocketMap[disconnectedUserId].size === 0) {
+                    delete userSocketMap[disconnectedUserId];
+                }
+            }
+            delete socketUserMap[socket.id];
             io.emit('getOnlineUsers',Object.keys(userSocketMap));
         })
     })
 }
 
 export function getReceiverSocketId(userId){
-    return userSocketMap[userId];
+    const sockets = userSocketMap[userId];
+    if (!sockets || sockets.size === 0) return null;
+    return [...sockets][0];
 }
 export{io}

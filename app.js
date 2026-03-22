@@ -19,10 +19,14 @@ const fallbackOrigins = [
 
 const normalizeOrigin = (value) => (value || '').trim().replace(/\/$/, '');
 
-const allowedOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || fallbackOrigins.join(','))
+const envOrigins = [process.env.FRONTEND_URLS, process.env.FRONTEND_URL]
+    .filter(Boolean)
+    .join(',')
     .split(',')
     .map((origin) => normalizeOrigin(origin))
     .filter(Boolean);
+
+const allowedOrigins = [...new Set([...fallbackOrigins.map((origin) => normalizeOrigin(origin)), ...envOrigins])];
 
 app.use(cors({
     origin:(origin, callback)=>{
