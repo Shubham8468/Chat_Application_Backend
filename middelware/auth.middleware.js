@@ -2,7 +2,11 @@ import jwt from 'jsonwebtoken'
 import {User} from '../model/user.model.js'
 import {catchAsyncError} from '../middelware/catchAsyncError.middelware.js'
 export const isAuthenticated= catchAsyncError(async (req,resp,next)=>{
-    const {token}=req.cookies;// distructure krna hai 
+    const cookieToken = req.cookies?.token;
+    const authHeader = req.headers?.authorization;
+    const bearerToken = authHeader?.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
+    const token = cookieToken || bearerToken;
+
     if(!token){
         return resp.status(401).json({message:"User not authenticated. Please sing in.",success:false})
     }
