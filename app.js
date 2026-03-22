@@ -12,7 +12,6 @@ config({ path: './config/.env' })
 
 const fallbackOrigins = [
     'https://chat-application-fontend.vercel.app',
-    'https://chat-application-frontend.vercel.app',
     'http://localhost:5173',
     'http://localhost:5174'
 ];
