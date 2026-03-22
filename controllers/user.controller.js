@@ -107,22 +107,31 @@ export const updateProfile=catchAsyncError(async (req,resp,next)=>
                 if(oldAvatarePublicId && oldAvatarePublicId.length>0){
                     await cloudinary.uploader.destroy(oldAvatarePublicId);
                 }
-                cloudinaryResponse=await cloudinary.uploader.upload(avatar.tempFilePath,
-                    {
-                        folder:"CHAT_APP_AVATARS",
-                        transformation:[
-                            {width:300,height:300,crop:'limit'},
-                            {quality:"auto"},
-                            {fetch_format:"auto"},
-                        ],
-                    }
-                )
+                
+                // Upload directly from buffer using upload_stream (works on Vercel serverless)
+                cloudinaryResponse = await new Promise((resolve, reject) => {
+                    const stream = cloudinary.uploader.upload_stream(
+                        {
+                            folder:"CHAT_APP_AVATARS",
+                            transformation:[
+                                {width:300,height:300,crop:'limit'},
+                                {quality:"auto"},
+                                {fetch_format:"auto"},
+                            ],
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+                    stream.end(avatar.data); // Use buffer directly
+                });
 
             }catch(err){
-              console.error("Cloudnary upload error:",err);
+              console.error("Cloudinary upload error:",err);
                             return resp.status(500).json({
                 success:false,
-                message:"Faild to upload avatar.Please try again later."
+                message:"Failed to upload avatar.Please try again later."
               })
             }
             

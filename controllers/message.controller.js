@@ -48,31 +48,47 @@ export const sendMessage = catchAsyncError(async (req, resp, next) => {
 
     if (media) {
         try {
-            const uploadResponse = await cloudinary.uploader.upload(
-            media.tempFilePath, {
-                resource_type: "auto", // auto-detecy img/videos come from frontend
-                folder: "CHAT_APP_MEDIA",
-                transformation: [{ width: 1080, height: 1080 },
-                { quality: "auto" },
-                { fetch_format: "auto" },
-                ]
-            }
-        );
-            mediaUrl = uploadResponse.secure_url;// lo isme put kr diya img/vid ka url jo frondent ko jaye ga
+            console.log("Uploading media:", { fileName: media.name, size: media.size });
+            
+            // Upload directly from buffer using upload_stream (works on Vercel serverless)
+            const uploadResponse = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                    {
+                        resource_type: "auto",
+                        folder: "CHAT_APP_MEDIA",
+                        transformation: [
+                            { width: 1080, height: 1080 },
+                            { quality: "auto" },
+                            { fetch_format: "auto" },
+                        ]
+                    },
+                    (error, result) => {
+                        if (error) reject(error);
+                        else resolve(result);
+                    }
+                );
+                stream.end(media.data); // Use buffer directly
+            });
+            
+            console.log("Cloudinary upload successful:", uploadResponse.public_id);
+            mediaUrl = uploadResponse.secure_url;
         }catch(err){
-            console.log("Cloudnary error:",err)
+            console.error("Cloudinary upload error:", err.message);
             return resp.status(500).json({success:false,message:'Failed to upload media.Please try again later.'})
         }
     }
-    const newMessage=await Message.create({ // in this we put use Message in DB
+    const newMessage=await Message.create({
         senderId,
         reciverId,
         text:sanitizedText,
         media: mediaUrl
     });
+    
+    console.log("Message saved to DB:", newMessage._id);
+    
     const receiverSocketId= getReceiverSocketId(reciverId);
     if(receiverSocketId){
-        io.to(receiverSocketId).emit("newMessage",newMessage)// to ka isi socketId pr emit krna hai
+        io.to(receiverSocketId).emit("newMessage",newMessage)
     }
     return resp.status(201).json(newMessage);
 })
