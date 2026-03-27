@@ -1,22 +1,22 @@
-# 💬 Chat Application — Backend
+#  Chat Application — Backend
 
 > A scalable, real-time chat application backend built with **Node.js**, **Express**, **MongoDB**, and **Socket.IO**. Supports authentication, media uploads via Cloudinary, and live messaging.
 
 ---
 
-## 🚀 Features
+##  Features
 
-- 🔐 **User Authentication** — Secure login & registration using JWT & bcryptjs
-- 💬 **Real-Time Messaging** — Instant bidirectional communication powered by Socket.IO
-- 🖼️ **Media Uploads** — Image/file sharing via Cloudinary integration
-- 🍪 **Cookie-Based Sessions** — Secure token storage with cookie-parser
-- 🌐 **CORS Support** — Configured for seamless frontend-backend communication
-- 📁 **File Handling** — Temporary file storage using express-fileupload
-- 🗄️ **MongoDB Database** — Persistent data storage via Mongoose ODM
+-  **User Authentication** — Secure login & registration using JWT & bcryptjs
+-  **Real-Time Messaging** — Instant bidirectional communication powered by Socket.IO
+-  **Media Uploads** — Image/file sharing via Cloudinary integration
+-  **Cookie-Based Sessions** — Secure token storage with cookie-parser
+-  **CORS Support** — Configured for seamless frontend-backend communication
+-  **File Handling** — Temporary file storage using express-fileupload
+-  **MongoDB Database** — Persistent data storage via Mongoose ODM
 
 ---
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 | Technology | Purpose |
 |---|---|
@@ -32,7 +32,7 @@
 
 ---
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 backend/
@@ -52,7 +52,7 @@ backend/
 
 ---
 
-## ⚙️ Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -106,9 +106,9 @@ npm test
 
 ---
 
-## 🔌 API Endpoints
+##  API Endpoints
 
-### 👤 User Routes — `/api/v1/user`
+###  User Routes — `/api/v1/user`
 
 | Method | Endpoint | Description |
 |---|---|---|
@@ -117,18 +117,18 @@ npm test
 | GET | `/logout` | Logout user |
 | GET | `/me` | Get current user profile |
 
-### 💬 Message Routes — `/api/v1/message`
+###  Message Routes — `/api/v1/message`
 
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | `/send/:id` | Send a message to a user |
 | GET | `/all/:id` | Get all messages with a user |
 
-> ⚠️ Routes may vary. Refer to the route files for the complete list.
+>  Routes may vary. Refer to the route files for the complete list.
 
 ---
 
-## 🔄 Real-Time Events (Socket.IO)
+##  Real-Time Events (Socket.IO)
 
 | Event | Description |
 |---|---|
@@ -139,7 +139,7 @@ npm test
 
 ---
 
-## 🌍 Environment Variables Reference
+##  Environment Variables Reference
 
 | Variable | Description |
 |---|---|
@@ -154,7 +154,7 @@ npm test
 
 ---
 
-## 📦 Dependencies
+##  Dependencies
 
 ```json
 {
@@ -172,7 +172,7 @@ npm test
 
 ---
 
-## 🔒 Security Practices
+##  Security Practices
 
 - Passwords are hashed using **bcryptjs** before storing in the database
 - Authentication is handled via **HTTP-only cookies** with JWT tokens
@@ -181,7 +181,7 @@ npm test
 
 ---
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! Feel free to open an issue or submit a pull request.
 
@@ -193,14 +193,14 @@ Contributions are welcome! Feel free to open an issue or submit a pull request.
 
 ---
 
-## 👨‍💻 Author
+##  Author
 
 **Shubham**
 - GitHub: [@Shubham8468](https://github.com/Shubham8468)
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the **ISC License**.
 
